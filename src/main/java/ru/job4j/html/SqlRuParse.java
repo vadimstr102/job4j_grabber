@@ -14,15 +14,18 @@ import java.util.GregorianCalendar;
 
 public class SqlRuParse {
     public static void main(String[] args) throws Exception {
-        Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
-        Elements row = doc.select(".postslisttopic");
-        for (Element td : row) {
-            Element href = td.child(0);
-            Element date = td.parent().child(5);
-            System.out.println(href.attr("href"));
-            System.out.println(href.text());
-            System.out.println(stringToDate(date.text()));
-            System.out.println();
+        int numPage = 5;
+        for (int i = 1; i <= numPage; i++) {
+            Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers/" + i).get();
+            Elements row = doc.select(".postslisttopic");
+            for (Element td : row) {
+                Element href = td.child(0);
+                Element date = td.parent().child(5);
+                System.out.println(href.attr("href"));
+                System.out.println(href.text());
+                System.out.println(stringToDate(date.text()));
+                System.out.println();
+            }
         }
     }
 
