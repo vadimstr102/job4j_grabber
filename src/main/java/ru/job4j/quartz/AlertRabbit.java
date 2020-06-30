@@ -13,7 +13,8 @@ import static org.quartz.TriggerBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, SchedulerException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException,
+            SchedulerException {
         Properties cfg = new Properties();
         try (FileInputStream in = new FileInputStream("src/main/resources/rabbit.properties")) {
             cfg.load(in);
@@ -59,7 +60,8 @@ public class AlertRabbit {
         public void execute(JobExecutionContext context) {
             System.out.println("Rabbit runs here ...");
             Connection cnt = (Connection) context.getJobDetail().getJobDataMap().get("connect");
-            try (PreparedStatement ps = cnt.prepareStatement("insert into rabbit (created_date) values (?)")) {
+            try (PreparedStatement ps = cnt.prepareStatement(
+                    "insert into rabbit (created_date) values (?)")) {
                 ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
                 ps.executeUpdate();
             } catch (SQLException e) {
