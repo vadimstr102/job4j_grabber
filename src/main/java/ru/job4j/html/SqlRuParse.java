@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,8 +38,20 @@ public class SqlRuParse {
         return sdfIn.parse(date);
     }
 
+    private static void adLoading(String link) throws IOException, ParseException {
+        Document doc = Jsoup.connect(link).get();
+        Elements messages = doc.select(".msgBody");
+        Element msg = messages.get(1);
+        String text = msg.text();
+        Elements footers = doc.select(".msgFooter");
+        Element footer = footers.first();
+        String date = footer.text().split(" \\[")[0];
+        Post post = new Post(text, stringToDate(date));
+        System.out.println(post.getText() + "\r\n" + post.getCreated());
+    }
+
     public static void main(String[] args) throws Exception {
-        int numPage = 5;
+        /*int numPage = 5;
         for (int i = 1; i <= numPage; i++) {
             Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers/" + i).get();
             Elements row = doc.select(".postslisttopic");
@@ -46,10 +59,13 @@ public class SqlRuParse {
                 Element href = td.child(0);
                 Element date = td.parent().child(5);
                 System.out.println(href.attr("href"));
+                adLoading(href.attr("href"));
                 System.out.println(href.text());
                 System.out.println(stringToDate(date.text()));
                 System.out.println();
             }
-        }
+        }*/
+
+        adLoading("https://www.sql.ru/forum/1326804/vakansiya-v-pochta-banke");
     }
 }
