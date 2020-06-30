@@ -65,13 +65,15 @@ public class SqlRuParse implements Parse {
     public static void main(String[] args) throws Exception {
         SqlRuParse sqlRuParse = new SqlRuParse();
         List<Post> posts = new ArrayList<>();
-        int numPage = 5;
+        int numPage = 1;
         for (int i = 1; i <= numPage; i++) {
             posts.addAll(sqlRuParse.list("https://www.sql.ru/forum/job-offers/" + i));
         }
         System.out.println(posts.size());
         for (Post post : posts) {
-            System.out.println(post.getText() + "\r\n" + post.getCreated());
+            System.out.println(post.getName() + "\r\n" + post.getLink());
+            Post postDetail = sqlRuParse.detail(post.getLink());
+            System.out.println(postDetail.getText() + "\r\n" + postDetail.getCreated());
         }
     }
 }
