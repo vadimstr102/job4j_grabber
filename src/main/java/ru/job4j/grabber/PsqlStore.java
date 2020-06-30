@@ -98,7 +98,7 @@ public class PsqlStore implements Store, AutoCloseable {
 
     public static void main(String[] args) throws IOException, ParseException {
         Properties cfg = new Properties();
-        try (FileInputStream in = new FileInputStream("src/main/resources/parser.properties")) {
+        try (FileInputStream in = new FileInputStream("src/main/resources/app.properties")) {
             cfg.load(in);
         } catch (IOException e) {
             e.printStackTrace();
