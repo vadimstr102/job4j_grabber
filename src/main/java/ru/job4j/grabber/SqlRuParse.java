@@ -1,4 +1,4 @@
-package ru.job4j.html;
+package ru.job4j.grabber;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,12 +9,10 @@ import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 
-public class SqlRuParse {
-    private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
+public class SqlRuParse implements Parse {
+    private DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
         @Override
         public String[] getMonths() {
             return new String[]{"янв", "фев", "мар", "апр", "май", "июн",
@@ -22,7 +20,7 @@ public class SqlRuParse {
         }
     };
 
-    private static Date stringToDate(String date) throws ParseException {
+    private Date stringToDate(String date) throws ParseException {
         if (date.contains("сегодня") || date.contains("вчера")) {
             Calendar calendar = new GregorianCalendar();
             int hour = Integer.parseInt(date.split(" ")[1].split(":")[0]);
@@ -38,7 +36,22 @@ public class SqlRuParse {
         return sdfIn.parse(date);
     }
 
-    private static void adLoading(String link) throws IOException, ParseException {
+    @Override
+    public List<Post> list(String link) throws IOException {
+        List<Post> result = new ArrayList<>();
+        Document doc = Jsoup.connect(link).get();
+        Elements row = doc.select(".postslisttopic");
+        for (int i = 3; i < row.size(); i++) {
+            Element href = row.get(i).child(0);
+            String name = href.text();
+            String postLink = href.attr("href");
+            result.add(new Post(name, postLink));
+        }
+        return result;
+    }
+
+    @Override
+    public Post detail(String link) throws IOException, ParseException {
         Document doc = Jsoup.connect(link).get();
         Elements messages = doc.select(".msgBody");
         Element msg = messages.get(1);
@@ -46,26 +59,19 @@ public class SqlRuParse {
         Elements footers = doc.select(".msgFooter");
         Element footer = footers.first();
         String date = footer.text().split(" \\[")[0];
-        Post post = new Post(text, stringToDate(date));
-        System.out.println(post.getText() + "\r\n" + post.getCreated());
+        return new Post(text, stringToDate(date));
     }
 
     public static void main(String[] args) throws Exception {
-        /*int numPage = 5;
+        SqlRuParse sqlRuParse = new SqlRuParse();
+        List<Post> posts = new ArrayList<>();
+        int numPage = 5;
         for (int i = 1; i <= numPage; i++) {
-            Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers/" + i).get();
-            Elements row = doc.select(".postslisttopic");
-            for (Element td : row) {
-                Element href = td.child(0);
-                Element date = td.parent().child(5);
-                System.out.println(href.attr("href"));
-                adLoading(href.attr("href"));
-                System.out.println(href.text());
-                System.out.println(stringToDate(date.text()));
-                System.out.println();
-            }
-        }*/
-
-        adLoading("https://www.sql.ru/forum/1326804/vakansiya-v-pochta-banke");
+            posts.addAll(sqlRuParse.list("https://www.sql.ru/forum/job-offers/" + i));
+        }
+        System.out.println(posts.size());
+        for (Post post : posts) {
+            System.out.println(post.getText() + "\r\n" + post.getCreated());
+        }
     }
 }
