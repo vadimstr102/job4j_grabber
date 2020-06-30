@@ -59,7 +59,8 @@ public class SqlRuParse implements Parse {
         Elements footers = doc.select(".msgFooter");
         Element footer = footers.first();
         String date = footer.text().split(" \\[")[0];
-        return new Post(text, stringToDate(date));
+        String name = msg.parent().parent().child(0).child(0).text();
+        return new Post(name, text, link, stringToDate(date));
     }
 
     public static void main(String[] args) throws Exception {
