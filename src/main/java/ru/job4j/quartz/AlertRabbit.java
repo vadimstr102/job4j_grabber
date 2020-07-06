@@ -3,20 +3,21 @@ package ru.job4j.quartz;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
-import static org.quartz.JobBuilder.*;
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 public class AlertRabbit {
     public static void main(String[] args) throws ClassNotFoundException, SQLException,
             SchedulerException {
         Properties cfg = new Properties();
-        try (FileInputStream in = new FileInputStream("src/main/resources/rabbit.properties")) {
+        try (InputStream in = AlertRabbit.class.getClassLoader()
+                .getResourceAsStream("rabbit.properties")) {
             cfg.load(in);
         } catch (IOException e) {
             e.printStackTrace();

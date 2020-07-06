@@ -4,6 +4,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -13,6 +15,8 @@ import java.util.List;
 import static ru.job4j.grabber.DateUtils.stringToDate;
 
 public class SqlRuParse implements Parse {
+    private static final Logger LOG = LoggerFactory.getLogger(SqlRuParse.class.getName());
+
     @Override
     public List<Post> list(String link) throws IOException {
         List<Post> result = new ArrayList<>();
@@ -32,7 +36,7 @@ public class SqlRuParse implements Parse {
         Document doc = Jsoup.connect(link).get();
         Elements messages = doc.select(".msgBody");
         Element msg = messages.get(1);
-        String text = msg.text();
+        String text = msg.html();
         Elements footers = doc.select(".msgFooter");
         Element footer = footers.first();
         String date = footer.text().split(" \\[")[0];
@@ -47,11 +51,21 @@ public class SqlRuParse implements Parse {
         for (int i = 1; i <= numPage; i++) {
             posts.addAll(sqlRuParse.list("https://www.sql.ru/forum/job-offers/" + i));
         }
-        System.out.println(posts.size());
+        LOG.debug("Number of posts: {}", posts.size());
         for (Post post : posts) {
-            System.out.println(post.getName() + "\r\n" + post.getLink());
+            LOG.debug(
+                    "{}{}{}",
+                    post.getName(),
+                    System.lineSeparator(),
+                    post.getLink()
+            );
             Post postDetail = sqlRuParse.detail(post.getLink());
-            System.out.println(postDetail.getText() + "\r\n" + postDetail.getCreated());
+            LOG.debug(
+                    "{}{}{}",
+                    postDetail.getText(),
+                    System.lineSeparator(),
+                    postDetail.getCreated()
+            );
         }
     }
 }
