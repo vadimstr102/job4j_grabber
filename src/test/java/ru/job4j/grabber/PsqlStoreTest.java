@@ -33,28 +33,31 @@ public class PsqlStoreTest {
     }
 
     @Test
-    public void whenSaveAndGet() {
+    public void whenSaveAndGet() throws Exception {
         int oldSize = store.getAll().size();
         store.save(post1);
         store.save(post2);
         store.save(post3);
         assertThat(store.getAll().size(), is(oldSize + 3));
+        store.close();
     }
 
     @Test
-    public void whenFindById() {
+    public void whenFindById() throws Exception {
         store.save(post1);
         store.save(post2);
         store.save(post3);
         assertThat(store.findById(post2.getId()).getName(), is("name2"));
+        store.close();
     }
 
     @Test
-    public void whenGetLastDate() {
+    public void whenGetLastDate() throws Exception {
         store.save(post1);
         store.save(post2);
         post3 = new Post("name3", "text3", "link3", new Date());
         store.save(post3);
         assertEquals(store.getLastDate(), post3.getCreated());
+        store.close();
     }
 }
